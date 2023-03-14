@@ -13,6 +13,17 @@ RUN useradd -ms /bin/bash $USERNAME
 USER $USERNAME
 WORKDIR /home/$USERNAME
 
+### NodeJS ###
+ENV NODE_VERSION=16.13.0
+ENV TRIGGER_REBUILD=1
+RUN curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | PROFILE=/dev/null bash \
+    && bash -c ". .nvm/nvm.sh \
+    && nvm install $NODE_VERSION \
+    && nvm alias default $NODE_VERSION \
+    && npm install -g typescript yarn node-gyp" \
+    && echo ". ~/.nvm/nvm.sh"  >> ~/.bashrc.d/50-node
+ENV PATH=$PATH:~/.nvm/versions/node/v${NODE_VERSION}/bin
+
 # Set-up necessary Env vars for PyEnv
 ENV PYENV_ROOT /home/$USERNAME/.pyenv
 ENV PATH $PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
